@@ -1,0 +1,22 @@
+{
+  "name": "webflow-code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "crisscross.js",
+  "scripts": {
+    "start": "parcel crisscross.js --hmr-port 50619"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crisscrossmoney/webflowcode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crisscrossmoney/webflowcode/issues"
+  },
+  "homepage": "https://github.com/crisscrossmoney/webflowcode#readme",
+  "dependencies": {
+    "parcel": "^2.8.3"
+  }
+}
