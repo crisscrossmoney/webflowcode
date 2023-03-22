@@ -557,6 +557,7 @@ function hmrAccept(bundle, id) {
 }
 
 },{}],"5fM3F":[function(require,module,exports) {
+const parceled = true;
 document.getElementById("createOrderButton").style.display = "none";
 const apiKey = document.getElementById("apikey");
 // Check if there is a saved API key in local storage and set it if so
