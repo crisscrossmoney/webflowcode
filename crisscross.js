@@ -66,7 +66,7 @@ function getPrices() {
       spotPrice.textContent = spotRate
       
 	//required currency
-      var amount = document.getElementById('amount');
+      var amount = document.getElementById('wantAmount');
       const destination = document.getElementById("destination-currency");
       let sourceRequired = formatter.format((1+(revRate/100)) * spotRate * amount.value);
       const srequired = document.getElementById("sourceRequired")
@@ -114,10 +114,10 @@ function getBalances() {
 // ORDERS
 
 function createOrder() {
-  let amount = parseFloat(document.getElementById("amount").value)
+  let amount = parseFloat(document.getElementById("wantAmount").value)
   
   let request = new XMLHttpRequest();
-  let orderUrl = new URL(baseUrl + 'createorder/');
+  let orderUrl = new URL(baseUrl + 'createorder/fiat/');
   let url = orderUrl.toString();
   request.open('POST', url, true);
   request.setRequestHeader('apikey', apiKey.value)
@@ -146,7 +146,7 @@ function createOrder() {
 }
 
 function createOrderArb() {
-  let amount = parseFloat(document.getElementById("amount").value)
+  let amount = parseFloat(document.getElementById("haveAmount").value)
   
   let request = new XMLHttpRequest();
   let orderUrl = new URL(baseUrl + 'createorder/arb/');
