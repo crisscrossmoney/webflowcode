@@ -1,6 +1,7 @@
 const parceled = true
 
-document.getElementById("createOrderButton").style.display = "none";
+//added 'block' to force the button as our trades arent time sensitive
+document.getElementById("createOrderButton").style.display = "block";
 const apiKey = document.getElementById("apikey");
 
 // Check if there is a saved API key in local storage and set it if so
@@ -13,19 +14,20 @@ let baseUrl = 'https://router.ptsd.capital/api/'
 const formatter = new Intl.NumberFormat('en-ZA', {
     style: 'currency',
     currency: 'ZAR',
-    minimumFractionDigits: 2
+    minimumFractionDigits: 3
   })
 const formatter_usd = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 2
+    minimumFractionDigits: 3
   })
 
+// not using right now
 function showOrderButton() {
   document.getElementById("createOrderButton").style.display = "block";
   setTimeout(hideOrderButton, 20000);
 }
-
+//not using right now
 function hideOrderButton() {
   document.getElementById("createOrderButton").style.display = "none";
 }
