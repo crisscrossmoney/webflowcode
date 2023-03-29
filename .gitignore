@@ -6,3 +6,5 @@
 # misc
 .parcel-cache/**
 .parcel-cache/data.mdb
+.cache
+.vscode

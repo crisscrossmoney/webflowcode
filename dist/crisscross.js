@@ -558,7 +558,8 @@ function hmrAccept(bundle, id) {
 
 },{}],"5fM3F":[function(require,module,exports) {
 const parceled = true;
-document.getElementById("createOrderButton").style.display = "none";
+//added 'block' to force the button as our trades arent time sensitive
+document.getElementById("createOrderButton").style.display = "block";
 const apiKey = document.getElementById("apikey");
 // Check if there is a saved API key in local storage and set it if so
 if (localStorage.getItem("apiKey")) apiKey.value = localStorage.getItem("apiKey");
@@ -566,23 +567,25 @@ let baseUrl = "https://router.ptsd.capital/api/";
 const formatter = new Intl.NumberFormat("en-ZA", {
     style: "currency",
     currency: "ZAR",
-    minimumFractionDigits: 2
+    minimumFractionDigits: 3
 });
 const formatter_usd = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2
 });
+// not using right now
 function showOrderButton() {
     document.getElementById("createOrderButton").style.display = "block";
     setTimeout(hideOrderButton, 20000);
 }
+//not using right now
 function hideOrderButton() {
     document.getElementById("createOrderButton").style.display = "none";
 }
 function getPrices() {
     let request = new XMLHttpRequest();
-    let ratesUrl = new URL(baseUrl + "getprivatequote/");
+    let ratesUrl = new URL(baseUrl + "getprivatequote/fiat/");
     // let ratesUrl = new URL(baseUrl + 'getbalances/');
     let url = ratesUrl.toString() + document.getElementById("source-currency").value + "-" + document.getElementById("destination-currency").value + "/";
     request.open("GET", url, true);
@@ -592,20 +595,19 @@ function getPrices() {
         let data = JSON.parse(this.response);
         if (request.status >= 200 && request.status < 400) {
             // update elements on the site with data returned from prices API
-            // safe is the cost price + tiny buffer
-            let bestQuote = Math.round(data["cost_rate"] * 100) / 100;
+            let bestQuote = Math.round(data["cost_rate"] * 1000) / 1000;
             const cost = document.getElementById("costPrice");
             cost.textContent = bestQuote;
             //Pulling rev rate from response
-            var revRate = Math.round(data["arb_rate"] * 100) / 100;
+            var revRate = Math.round(data["arb_rate"] * 1000) / 1000;
             const revArb = document.getElementById("revArb");
             revArb.value = revRate;
             //Competitor pricing
-            var retailRate = Math.round(data["rrp"] * 100) / 100;
+            var retailRate = Math.round(data["rrp"] * 1000) / 1000;
             const retailPrice = document.getElementById("marketRate");
             retailPrice.value = retailRate;
             //FX pricing
-            var spotRate = Math.round(data["fx_ask_price"] * 100) / 100;
+            var spotRate = Math.round(data["fx_ask_price"] * 1000) / 1000;
             const spotPrice = document.getElementById("spotRate");
             spotPrice.textContent = spotRate;
             //required currency
@@ -627,7 +629,8 @@ function getPrices() {
             const revBar = document.getElementById("revBar");
             revBar.style.width = barWidth + "%";
             //show order button for 10 seconds
-            showOrderButton();
+            //showOrderButton()
+            getBalances();
         }
     };
     request.send();
@@ -641,9 +644,8 @@ function getBalances() {
     request.setRequestHeader("apikey", apiKey.value);
     request.onload = function() {
         let data = JSON.parse(this.response);
-        // const valrBalance = data['valr']['ZAR']['Available']
-        const valrBalance = data["valr"];
-        const valr = document.getElementById("valrBalance");
+        const valrBalance = data["valr"][0]["available"];
+        const valr = document.getElementById("sourceBalance");
         valr.textContent = formatter.format(valrBalance);
     };
     request.send();
@@ -667,7 +669,33 @@ function createOrder() {
         "reference": document.getElementById("orderReference").value,
         "from_currency": document.getElementById("source-currency").value,
         "to_currency": document.getElementById("destination-currency").value,
-        "size": amount,
+        "want": amount,
+        "rate": arbTarget,
+        "twofa": document.getElementById("otp").value,
+        "trade_now": tradeNow,
+        "withdrawal_address": wallet
+    };
+    request.send(JSON.stringify(json));
+}
+function createOrderArb() {
+    let amount = parseFloat(document.getElementById("amount").value);
+    let request = new XMLHttpRequest();
+    let orderUrl = new URL(baseUrl + "createorder/arb/");
+    let url = orderUrl.toString();
+    request.open("POST", url, true);
+    request.setRequestHeader("apikey", apiKey.value);
+    request.onload = function() {
+        if (request.status == 200) alert("Order created");
+        else alert("Order error");
+    };
+    let wallet = document.getElementById("clientWalletAddress").value;
+    let tradeNow = JSON.parse(document.getElementById("tradeNow").value);
+    let arbTarget = parseFloat(document.getElementById("revArb").value);
+    json = {
+        "reference": document.getElementById("orderReference").value,
+        "from_currency": document.getElementById("source-currency").value,
+        "to_currency": document.getElementById("destination-currency").value,
+        "have": amount,
         "arb_rate": arbTarget,
         "twofa": document.getElementById("otp").value,
         "trade_now": tradeNow,
