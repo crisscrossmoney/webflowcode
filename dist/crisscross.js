@@ -616,14 +616,15 @@ function getPricesFiat() {
             const tradeRateFiat = document.getElementById("tradeRateFiat");
             tradeRateFiat.value = tradeRateFiatValue;
             let rrpFiatValue = Math.round(data["rrp"] * 1000) / 1000;
-            const rrpFiat1 = document.getElementById("rrpFiat");
-            rrpFiat1.value = rrpFiatValue;
+            const rrpFiat = document.getElementById("rrpFiat");
+            rrpFiat.value = rrpFiatValue;
             let spotRateValue = Math.round(data["fx_ask_price"] * 1000) / 1000;
             const spotRate = document.getElementById("spotRate");
             spotRate.textContent = spotRateValue;
             // Update Right Side Form
             document.getElementById("orderSize").textContent = formatter_usd.format(wantAmount.value);
             document.getElementById("targetRate").textContent = formatter.format(rrpFiatValue);
+            updateSourceRequired();
         }
     };
     request.send();
@@ -717,18 +718,26 @@ function completeOrder() {
         getPricesFiat();
         getBalances();
     });
-    const rrpArbElement = document.getElementById("rrpArb");
-    rrpArbElement.addEventListener("change", (event)=>{
-        console.log(event);
-        const arbRate = parseFloat(document.getElementById("rrpArb").value);
-        const spotPrice = parseFloat(document.getElementById("spotRate").textContent);
-        if (!isNaN(arbRate)) {
-            let want = parseFloat(document.getElementById("wantAmount").value);
-            const sourceRequired = document.getElementById("sourceRequired");
-            sourceRequired.textContent = formatter.format(rrpFiat * want);
-        }
-    });
 })();
+// Updates the source currency required when either its changed by user or prgramatically
+function updateSourceRequired() {
+    const rrpFiatValue = parseFloat(document.getElementById("rrpFiat").value);
+    const wantAmountValue = parseFloat(document.getElementById("wantAmount").value);
+    const haveAmountValue = parseFloat(document.getElementById("haveAmount").value);
+    const sourceRequired = document.getElementById("sourceRequired");
+    if (!isNaN(rrpFiatValue)) {
+        if (!isNaN(wantAmountValue)) sourceRequired.textContent = formatter.format(rrpFiatValue * wantAmountValue);
+        else if (!isNaN(haveAmountValue)) sourceRequired.textContent = formatter.format(haveAmountValue);
+    }
+}
+const rrpFiatElement = document.getElementById("rrpFiat");
+rrpFiatElement.addEventListener("change", (event)=>{
+    updateSourceRequired();
+});
+const wantAmountElement = document.getElementById("wantAmount");
+wantAmountElement.addEventListener("change", (event)=>{
+    updateSourceRequired();
+});
 // Create Fiat order  
 (function createOrderOnClick() {
     const button = document.getElementById("createOrderButtonFiat");
