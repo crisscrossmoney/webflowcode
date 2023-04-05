@@ -78,10 +78,7 @@ function getPricesFiat() {
       let spotRateValue = Math.round(data['fx_ask_price'] * 1000) / 1000;
       const spotRate = document.getElementById("spotRate");
       spotRate.textContent = spotRateValue;
-      
-      // Update Right Side Form
-      document.getElementById("orderSize").textContent = formatter_usd.format(wantAmount.value);
-      document.getElementById("targetRate").textContent = formatter.format(rrpFiatValue);
+      //This has to live here as it updates source required when it gets a reponse, which is sometimes delayed
       updateSourceRequired();
     }
   }
@@ -108,7 +105,7 @@ function getBalances() {
 // ORDERS
 
 function createOrder() {
-  let have = parseFloat(document.getElementById("wantAmount").value)
+  let want = parseFloat(document.getElementById("wantAmount").value)
   
   let request = new XMLHttpRequest();
   let orderUrl = new URL(baseUrl + 'createorder/fiat');
@@ -131,7 +128,7 @@ function createOrder() {
             "reference": document.getElementById("orderReference").value,
             "from_currency": document.getElementById('source-currency').value,
             "to_currency": document.getElementById('destination-currency').value,
-            "wantAmount": have,
+            "want": want,
             "trade_rate": rateTarget,
             "rate": clientTateTarget,
             "twofa": document.getElementById("otp").value,
@@ -198,21 +195,21 @@ function completeOrder() {
 })();
 
 // Updates the source currency required when either its changed by user or prgramatically
-
 function updateSourceRequired() {
   const rrpFiatValue = parseFloat(document.getElementById("rrpFiat").value);
   const wantAmountValue = parseFloat(document.getElementById("wantAmount").value);
   const haveAmountValue = parseFloat(document.getElementById("haveAmount").value);
-
   const sourceRequired = document.getElementById("sourceRequired");
-
   if (!isNaN(rrpFiatValue)) {
-    if (!isNaN(wantAmountValue)) {
+    if (!isNaN(wantAmountValue) && wantAmountValue !== 0) {
       sourceRequired.textContent = formatter.format(rrpFiatValue * wantAmountValue);
+      document.getElementById("orderSize").textContent = formatter_usd.format(wantAmount.value);
     } else if (!isNaN(haveAmountValue)) {
       sourceRequired.textContent = formatter.format(haveAmountValue);
+      document.getElementById("orderSize").textContent = formatter_usd.format(haveAmountValue / rrpFiatValue);
     }
   }
+  document.getElementById("targetRate").textContent = formatter.format(rrpFiatValue);
 }
 const rrpFiatElement = document.getElementById("rrpFiat");
 rrpFiatElement.addEventListener("change", event => {
