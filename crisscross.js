@@ -225,9 +225,10 @@ wantAmountElement.addEventListener("change", event => {
   const button = document.getElementById("createOrderButtonFiat");
   button.addEventListener("click", event => {
     let have = parseFloat(document.getElementById("haveAmount").value)
+    let want = parseFloat(document.getElementById("wantAmount").value)
     let reference = document.getElementById("orderReference").value
     
-    if (reference.includes("test") || have > 9) {
+    if (reference.includes("test") || have > 9 || want > 9) {
         createOrder();
     } else {
       alert("Order size can't be less than $10")
@@ -240,10 +241,11 @@ wantAmountElement.addEventListener("change", event => {
 (function createOrderOnClickArb() {
   const button = document.getElementById("createOrderButtonArb");
   button.addEventListener("click", event => {
-    let want = parseFloat(document.getElementById("wantAmount").value);
+    let have = parseFloat(document.getElementById("haveAmount").value)
+    let want = parseFloat(document.getElementById("wantAmount").value)
     let reference = document.getElementById("orderReference").value;
 
-    if (reference.includes("test") || want > 9) {
+    if (reference.includes("test") || want > 9 || have > 9) {
       createOrderArb();
     } else {
       alert("Order size can't be less than $10");
